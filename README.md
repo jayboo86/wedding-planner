@@ -1,3 +1,29 @@
+# Wedding Planner App
+
+A modern React + Vite app for planning your wedding, tracking tasks, owners, deadlines, vendors, and budget.
+
+## Live Demo
+
+The app is deployed at: [https://wedding-planner-gamma.vercel.app/](https://wedding-planner-gamma.vercel.app/)
+
+## Features
+- Add, edit, and delete wedding tasks
+- Assign owners, set priorities, and track status
+- Manage vendors and budget for each task
+- Filter tasks by owner and status
+- Progress and budget summary dashboard
+- Data persists in local storage
+
+## Getting Started
+
+1. Clone the repo
+2. Run `npm install`
+3. Start with `npm run dev`
+
+---
+
+Below is the original template README for reference.
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
