@@ -51,6 +51,9 @@ const emptyForm = {
   priority: "Medium",
   status: "Not Started",
   notes: "",
+  vendor: "",
+  estimatedCost: "",
+  paidAmount: "",
 };
 
 const badgeClass = {
@@ -79,6 +82,15 @@ export default function App() {
 
   const completed = tasks.filter((task) => task.status === "Complete").length;
   const percent = tasks.length ? Math.round((completed / tasks.length) * 100) : 0;
+  const totalBudget = tasks.reduce(
+    (sum, task) => sum + Number(task.estimatedCost || 0),
+    0
+  );
+  const totalPaid = tasks.reduce(
+    (sum, task) => sum + Number(task.paidAmount || 0),
+    0
+  );
+  const totalRemaining = totalBudget - totalPaid;
 
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {
@@ -124,18 +136,21 @@ export default function App() {
   }
 
   function startEdit(task) {
-    setEditingId(task.id);
-    setForm({
-      title: task.title,
-      category: task.category,
-      owner: task.owner,
-      dueDate: task.dueDate,
-      priority: task.priority,
-      status: task.status,
-      notes: task.notes || "",
-    });
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
+  setEditingId(task.id);
+  setForm({
+    title: task.title,
+    category: task.category,
+    owner: task.owner,
+    dueDate: task.dueDate,
+    priority: task.priority,
+    status: task.status,
+    notes: task.notes || "",
+    vendor: task.vendor || "",
+    estimatedCost: task.estimatedCost || "",
+    paidAmount: task.paidAmount || "",
+  });
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
 
   function cancelEdit() {
     setEditingId(null);
@@ -197,6 +212,15 @@ export default function App() {
           <div className="rounded-3xl bg-white p-5 shadow-sm">
             <p className="text-sm text-slate-500">Completed</p>
             <p className="mt-2 text-3xl font-semibold">{completed}</p>
+          </div>
+          <div className="rounded-3xl bg-white p-5 shadow-sm">
+            <p className="text-sm text-slate-500">Wedding Budget</p>
+            <p className="mt-2 text-lg font-semibold">
+              ${totalPaid.toLocaleString()} spent
+            </p>
+            <p className="text-sm text-slate-500">
+              ${totalRemaining.toLocaleString()} remaining
+            </p>
           </div>
         </section>
 
@@ -309,6 +333,40 @@ export default function App() {
                   className="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
                 />
               </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium">Vendor</label>
+                <input
+                  name="vendor"
+                  value={form.vendor}
+                  onChange={handleChange}
+                  placeholder="Example: Smith Photography"
+                  className="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm"
+                />
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="mb-1 block text-sm font-medium">Estimated Cost</label>
+                  <input
+                    type="number"
+                    name="estimatedCost"
+                    value={form.estimatedCost}
+                    onChange={handleChange}
+                    className="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-sm font-medium">Amount Paid</label>
+                  <input
+                    type="number"
+                    name="paidAmount"
+                    value={form.paidAmount}
+                    onChange={handleChange}
+                    className="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm"
+                  />
+                </div>
+              </div>
 
               <div className="flex gap-2">
                 <button
@@ -394,8 +452,24 @@ export default function App() {
                       {task.notes ? (
                         <p className="text-sm text-slate-500">{task.notes}</p>
                       ) : null}
-                    </div>
+                      {task.vendor && (
+                        <p className="text-sm text-slate-500">
+                          Vendor: {task.vendor}
+                        </p>
+                      )}
 
+                      {task.estimatedCost && (
+                        <div className="text-sm text-slate-500">
+                          <p>Budget: ${task.estimatedCost}</p>
+                          <p>Paid: ${task.paidAmount || 0}</p>
+                          <p>
+                            Remaining: $
+                            {Math.max(Number(task.estimatedCost || 0) - Number(task.paidAmount || 0), 0)}
+                          </p>
+                        </div>
+                      )}
+
+                    </div>
                     <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => startEdit(task)}
