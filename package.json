@@ -1,16 +1,25 @@
 {
-  "name": "wedding-planner-api",
-  "version": "1.0.0",
+  "name": "wedding-planner",
   "private": true,
-  "main": "index.js",
-  "type": "commonjs",
+  "version": "0.0.1",
+  "type": "module",
   "scripts": {
-    "dev": "node index.js",
-    "start": "node index.js"
+    "dev": "C:\\PROGRA~1\\nodejs\\node.exe ./node_modules/vite/bin/vite.js",
+    "build": "C:\\PROGRA~1\\nodejs\\node.exe ./node_modules/vite/bin/vite.js build",
+    "preview": "C:\\PROGRA~1\\nodejs\\node.exe ./node_modules/vite/bin/vite.js preview"
   },
   "dependencies": {
-    "better-sqlite3": "^12.6.2",
-    "cors": "^2.8.5",
-    "express": "^5.1.0"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.2.1",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.27",
+    "eslint": "^9.9.1",
+    "eslint-plugin-react": "^7.35.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "tailwindcss": "^3.4.19",
+    "vite": "^5.4.8"
   }
 }

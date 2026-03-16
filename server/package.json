@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-  "dev": "nodemon index.js",
-  "start": "node index.js"
-},
+    "dev": "C:\\PROGRA~1\\nodejs\\node.exe index.js",
+    "start": "C:\\PROGRA~1\\nodejs\\node.exe index.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
