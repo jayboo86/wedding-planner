@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
+const API_URL = "http://localhost:4000/api/tasks";
+
 const starterTasks = [
   {
     id: 1,
@@ -66,19 +68,27 @@ const badgeClass = {
 };
 
 export default function App() {
-  const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem("wedding-planner-tasks");
-    return saved ? JSON.parse(saved) : starterTasks;
-  });
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [ownerFilter, setOwnerFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
 
+  // Load tasks from backend on mount
   useEffect(() => {
-    localStorage.setItem("wedding-planner-tasks", JSON.stringify(tasks));
-  }, [tasks]);
+    fetch(API_URL)
+      .then((res) => res.json())
+      .then((data) => {
+        setTasks(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setTasks([]);
+        setLoading(false);
+      });
+  }, []);
 
   const completed = tasks.filter((task) => task.status === "Complete").length;
   const percent = tasks.length ? Math.round((completed / tasks.length) * 100) : 0;
@@ -105,33 +115,40 @@ export default function App() {
     setForm((prev) => ({ ...prev, [name]: value }));
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-
     if (!form.title.trim()) return;
 
     if (editingId) {
-      setTasks((prev) =>
-        prev.map((task) =>
-          task.id === editingId
-            ? {
-                ...task,
-                ...form,
-                title: form.title.trim(),
-              }
-            : task
-        )
-      );
+      // Update task via backend
+      const updatedTask = { ...form, title: form.title.trim() };
+      try {
+        const res = await fetch(`${API_URL}/${editingId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedTask),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setTasks((prev) => prev.map((task) => (task.id === editingId ? data : task)));
+        }
+      } catch {}
       setEditingId(null);
     } else {
-      const newTask = {
-        id: Date.now(),
-        ...form,
-        title: form.title.trim(),
-      };
-      setTasks((prev) => [newTask, ...prev]);
+      // Add new task via backend
+      const newTask = { ...form, title: form.title.trim() };
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newTask),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setTasks((prev) => [data, ...prev]);
+        }
+      } catch {}
     }
-
     setForm(emptyForm);
   }
 
@@ -157,28 +174,40 @@ export default function App() {
     setForm(emptyForm);
   }
 
-  function toggleComplete(id) {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === id
-          ? {
-              ...task,
-              status: task.status === "Complete" ? "Not Started" : "Complete",
-            }
-          : task
-      )
-    );
+  async function toggleComplete(id) {
+    const task = tasks.find((t) => t.id === id);
+    if (!task) return;
+    const updated = { ...task, status: task.status === "Complete" ? "Not Started" : "Complete" };
+    try {
+      const res = await fetch(`${API_URL}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updated),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setTasks((prev) => prev.map((t) => (t.id === id ? data : t)));
+      }
+    } catch {}
   }
 
-  function deleteTask(id) {
+  async function deleteTask(id) {
     if (editingId === id) {
       cancelEdit();
     }
-    setTasks((prev) => prev.filter((task) => task.id !== id));
+    try {
+      const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setTasks((prev) => prev.filter((task) => task.id !== id));
+      }
+    } catch {}
   }
 
   return (
     <div className="min-h-screen bg-stone-50 p-6 text-slate-900">
+      {loading && (
+        <div className="text-center text-slate-500">Loading tasks...</div>
+      )}
       <div className="mx-auto max-w-6xl space-y-6">
         <header className="rounded-3xl bg-white p-6 shadow-sm">
           <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">
