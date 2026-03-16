@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "C:\\PROGRA~1\\nodejs\\node.exe index.js",
-    "start": "C:\\PROGRA~1\\nodejs\\node.exe index.js"
+    "dev": "node index.js",
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
