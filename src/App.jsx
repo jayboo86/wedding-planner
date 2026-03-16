@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-const API_URL = "http://localhost:4000/api/tasks";
+const API_URL = "https://wedding-planner-l95t.onrender.com/api/tasks";
 
 const starterTasks = [
   {
