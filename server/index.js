@@ -159,6 +159,7 @@ app.delete("/api/tasks/:id", (req, res) => {
 
 // --- AUTH ROUTES ---
 app.post('/api/login', (req, res) => {
+  console.log('LOGIN BODY:', req.body); // Debug log
   const { username, password } = req.body;
   if (!username || !password) {
     return res.status(400).json({ error: 'Username and password required' });
