@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const db = require("./db");
+const auth = require('./auth');
 
 const app = express();
 const PORT = 4000;
@@ -154,6 +155,30 @@ app.delete("/api/tasks/:id", (req, res) => {
   }
 
   res.status(204).send();
+});
+
+// --- AUTH ROUTES ---
+app.post('/api/login', (req, res) => {
+  console.log('LOGIN BODY:', req.body); // Debug log
+  const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username and password required' });
+  }
+  if (!auth.authenticateUser(username, password)) {
+    return res.status(401).json({ error: 'Invalid credentials' });
+  }
+  const token = auth.generateToken(username);
+  res.json({ token });
+});
+
+// Example protected route
+app.get('/api/protected', (req, res) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'No token provided' });
+  const payload = auth.verifyToken(token);
+  if (!payload) return res.status(403).json({ error: 'Invalid token' });
+  res.json({ message: `Hello, ${payload.username}` });
 });
 
 app.listen(PORT, () => {
